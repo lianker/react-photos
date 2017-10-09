@@ -10,7 +10,6 @@ import { Router, Route, browserHistory } from "react-router";
 import { matchPattern } from "react-router/lib/PatternUtils";
 
 function verificaAutenticacao(nextState, replace) {
-  debugger;
   const resultado = matchPattern("/timeline(/:login)", nextState.location.pathname);
   const enderecoPrivadoTimeline = resultado.paramValues[0] === undefined;
 

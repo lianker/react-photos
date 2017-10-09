@@ -35,6 +35,47 @@ export default class Timeline extends Component {
     this.carregaFotos();
   }
 
+  like(fotoId) {
+    fetch(`http://localhost:8080/api/fotos/${fotoId}/like?X-AUTH-TOKEN=${localStorage.getItem("auth-token")}`, {
+      method: "POST",
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("não foi possível realizar o like da foto");
+        }
+      })
+      .then(liker => {
+        Pubsub.publish("atualiza-liker", { fotoId, liker });
+      });
+  }
+
+  comenta(fotoId, textoComentario) {
+    const requestInfo = {
+      method: "POST",
+      body: JSON.stringify({ texto: textoComentario }),
+      headers: new Headers({
+        "Content-type": "application/json",
+      }),
+    };
+
+    fetch(
+      `http://localhost:8080/api/fotos/${fotoId}/comment?X-AUTH-TOKEN=${localStorage.getItem("auth-token")}`,
+      requestInfo
+    )
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("não foi possível comentar");
+        }
+      })
+      .then(novoComentario => {
+        Pubsub.publish("novos-comentarios", { fotoId, novoComentario });
+      });
+  }
+
   componentWillReceiveProps(nextProps) {
     debugger;
     if (nextProps.login !== undefined) {
@@ -45,7 +86,9 @@ export default class Timeline extends Component {
 
   render() {
     return (
-      <div className="fotos container">{this.state.fotos.map(foto => <FotoItem key={foto.id} foto={foto} />)}</div>
+      <div className="fotos container">
+        {this.state.fotos.map(foto => <FotoItem comenta={this.comenta} like={this.like} key={foto.id} foto={foto} />)}
+      </div>
     );
   }
 }

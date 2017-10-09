@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import FotoItem from "./FotoItem";
 import Pubsub from "pubsub-js";
+// import ReactCSSTransitionGroup from "react/lib/ReactCSSTransitionGroup";
 
 export default class Timeline extends Component {
   constructor(props) {
@@ -12,6 +13,27 @@ export default class Timeline extends Component {
   componentWillMount() {
     Pubsub.subscribe("timeline", (topico, fotos) => {
       this.setState({ fotos });
+    });
+
+    Pubsub.subscribe("atualiza-liker", (topico, infoLiker) => {
+      const fotoAchada = this.state.fotos.find(foto => foto.id === infoLiker.fotoId);
+      fotoAchada.likeada = !fotoAchada.likeada;
+
+      const possivelLiker = fotoAchada.likers.find(liker => liker.login === infoLiker.liker.login);
+
+      if (possivelLiker === undefined) {
+        fotoAchada.likers.push(infoLiker.liker);
+      } else {
+        const novosLikers = fotoAchada.likers.filter(liker => liker.login !== infoLiker.liker.login);
+        fotoAchada.likers = novosLikers;
+      }
+      this.setState({ fotos: this.state.fotos });
+    });
+
+    Pubsub.subscribe("novos-comentarios", (topico, infoComentario) => {
+      const fotoAchada = this.state.fotos.find(foto => foto.id === infoComentario.fotoId);
+      fotoAchada.comentarios.push(infoComentario.novoComentario);
+      this.setState({ fotos: this.state.fotos });
     });
   }
 
@@ -33,6 +55,13 @@ export default class Timeline extends Component {
 
   componentDidMount() {
     this.carregaFotos();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.login !== undefined) {
+      this.login = nextProps.login;
+      this.carregaFotos();
+    }
   }
 
   like(fotoId) {
@@ -76,18 +105,12 @@ export default class Timeline extends Component {
       });
   }
 
-  componentWillReceiveProps(nextProps) {
-    debugger;
-    if (nextProps.login !== undefined) {
-      this.login = nextProps.login;
-      this.carregaFotos();
-    }
-  }
-
   render() {
     return (
       <div className="fotos container">
-        {this.state.fotos.map(foto => <FotoItem comenta={this.comenta} like={this.like} key={foto.id} foto={foto} />)}
+        {this.state.fotos.map(foto => <FotoItem key={foto.id} foto={foto} like={this.like} comenta={this.comenta} />)}
+        {/* <ReactCSSTransitionGroup transitionName="timeline" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+        </ReactCSSTransitionGroup> */}
       </div>
     );
   }

@@ -1,15 +1,11 @@
 import React, { Component } from "react";
-import Pubsub from "pubsub-js";
+import TimeLineApi from "../logicas/TimelineApi";
 
 export default class Header extends Component {
   pesquisa(event) {
     event.preventDefault();
 
-    fetch(`http://localhost:8080/api/public/fotos/${this.loginPesquisado.value}`)
-      .then(response => response.json())
-      .then(fotos => {
-        Pubsub.publish("timeline", fotos);
-      });
+    this.props.store.dispatch(TimeLineApi.pesquisa(this.loginPesquisado.value));
   }
 
   render() {

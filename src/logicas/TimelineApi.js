@@ -1,5 +1,4 @@
-import { like, comentario, listagem } from "../actions/actionCreators";
-import Pubsub from "pubsub-js";
+import { like, comentario, listagem, notifica } from "../actions/actionCreators";
 
 export default class TimelineApi {
   constructor(fotos) {
@@ -67,6 +66,13 @@ export default class TimelineApi {
       fetch(`http://localhost:8080/api/public/fotos/${login}`)
         .then(response => response.json())
         .then(fotos => {
+
+          if (fotos.length === 0) {
+            dispatch(notifica("Dados de usuário não encontrados"))
+          }else{
+            dispatch(notifica("Dados encontrados"))
+          }
+
           dispatch(listagem(fotos));
           return fotos;
         });

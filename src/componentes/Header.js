@@ -2,6 +2,18 @@ import React, { Component } from "react";
 import TimeLineApi from "../logicas/TimelineApi";
 
 export default class Header extends Component {
+
+  constructor(){
+    super();
+    this.state = {msg:""};
+  }
+
+  componentWillMount() {
+    this.props.store.subscribe(() => {
+      this.setState({ msg: this.props.store.getState().notificacao });
+    });
+  }
+
   pesquisa(event) {
     event.preventDefault();
 
@@ -27,6 +39,7 @@ export default class Header extends Component {
         <nav>
           <ul className="header-nav">
             <li className="header-nav-item">
+              <span> {this.state.msg} </span>
               <a href="#">
                 ♡
                 {/*                 ♥ */}

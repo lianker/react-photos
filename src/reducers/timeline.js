@@ -14,24 +14,29 @@ export function timeLineReducer(state = new List(), action) {
     return new List(action.fotos);
   } else if (action.type === "COMENTARIO") {
     return trocaFoto(state, action.fotoId, fotoEstadoAntigo => {
-      const novosComentarios = fotoEstadoAntigo.comentarios.concat(action.novoComentario);
+      const novosComentarios = fotoEstadoAntigo.comentarios.concat(
+        action.novoComentario
+      );
       return { comentarios: novosComentarios };
     });
   } else if (action.type === "LIKE") {
     return trocaFoto(state, action.fotoId, fotoEstadoAntigo => {
       const liker = action.liker;
-      const possivelLiker = fotoEstadoAntigo.likers.find(likerAtual => likerAtual.login === liker.login);
+      const possivelLiker = fotoEstadoAntigo.likers.find(
+        likerAtual => likerAtual.login === liker.login
+      );
 
       let novosLikers;
       if (possivelLiker === undefined) {
         novosLikers = fotoEstadoAntigo.likers.concat(liker);
       } else {
-        novosLikers = fotoEstadoAntigo.likers.filter(likerAtual => likerAtual.login !== liker.login);
+        novosLikers = fotoEstadoAntigo.likers.filter(
+          likerAtual => likerAtual.login !== liker.login
+        );
       }
 
       return { likers: novosLikers, likeada: !fotoEstadoAntigo.likeada };
     });
   }
-
   return state;
 }

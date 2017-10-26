@@ -1,5 +1,5 @@
 export function notificacao(state = "", action) {
-  if (action.type === "ALERT") {
+  if (action.type === "NOTIFICACAO") {
     return action.msg;
   }
 
